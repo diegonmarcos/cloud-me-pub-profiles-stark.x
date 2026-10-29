@@ -5,6 +5,7 @@
   "label": "cloud-me-pub-profiles-stark.x",
   "code": "1.2.1.1.5",
   "kind": "repo",
+  "variant": "repo",
   "description": "Stark.x — company site",
   "visibility": "public",
   "url": "https://github.com/diegonmarcos/cloud-me-pub-profiles-stark.x",
