@@ -27,6 +27,8 @@ jobs:
         run: npm install --no-fund --no-audit --no-save typescript@^5.7 sass esbuild
       - name: Build (repo engine)
         run: |
+          # the engine templates live in the deployer submodule; expose them at the path the engine expects (not committed)
+          [ -e 9_others ] || ln -s 0_deployer/9_others 9_others
           export PATH="$PWD/node_modules/.bin:$PATH"
           bash build.sh build
           ls -R dist | head -60
