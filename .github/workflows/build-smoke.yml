@@ -1,0 +1,55 @@
+# #1919: build dist with the repo's own engine, smoke-test it (page loads, no console errors, drag rotates the cube),
+# prove the test red with a mutation, then persist dist/ so the diegonmarcos.github.io overlay publishes a complete build.
+name: Build and smoke
+on:
+  push:
+    branches: [main]
+    paths-ignore: ['dist/**']
+  workflow_dispatch:
+  schedule:
+    - cron: '17 4 * * *'
+permissions:
+  contents: write
+concurrency:
+  group: build-smoke
+  cancel-in-progress: false
+jobs:
+  build-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install build tools
+        run: npm install --no-fund --no-audit --no-save typescript@^5.7 sass esbuild
+      - name: Build (repo engine)
+        run: |
+          export PATH="$PWD/node_modules/.bin:$PATH"
+          bash build.sh build
+          ls -R dist | head -60
+      - name: Install Playwright
+        run: |
+          npm install --no-fund --no-audit --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Smoke test the built dist
+        run: |
+          (cd dist && python3 -m http.server 8080 >/dev/null 2>&1 &)
+          sleep 2
+          node tests/smoke.mjs http://127.0.0.1:8080/
+      - name: Mutation, the smoke test must go red
+        run: |
+          rm -rf /tmp/mut && cp -rL dist /tmp/mut
+          (cd /tmp/mut && rm -f scripts/main.js && python3 -m http.server 8081 >/dev/null 2>&1 &)
+          sleep 2
+          if node tests/smoke.mjs http://127.0.0.1:8081/; then echo "mutation survived: smoke test is too weak"; exit 1; fi
+          echo "mutation killed, smoke test is red as required"
+      - name: Persist built dist
+        if: github.event_name != 'pull_request'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f dist
+          if git diff --cached --quiet; then echo "dist unchanged"; else git commit -m "ci: persist built dist [skip ci]" && git pull --rebase origin main && git push origin HEAD:main; fi
