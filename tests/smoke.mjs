@@ -21,7 +21,7 @@ await page.waitForTimeout(2500);
 const cube = page.locator('#services-cube');
 if (await cube.count() !== 1) fail('#services-cube missing');
 else {
-  await cube.scrollIntoViewIfNeeded();
+  await cube.evaluate((e) => e.scrollIntoView({ block: 'center' }));
   await page.waitForTimeout(500);
   const box = await cube.boundingBox();
   const cx = box.x + box.width / 2, cy = box.y + box.height / 2;
