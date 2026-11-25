@@ -26,6 +26,14 @@
       "dir": "src/scripts"
     },
     {
+      "_doc": "#1919: the engine tsc mod only type-checks (it discards everything but a named output), so dist/scripts/main.js was never produced and index.html loaded a 404. Bundle the ES module entry for the browser.",
+      "mod": "esbuild",
+      "input": "src/scripts/main.ts",
+      "output": "scripts/main.js",
+      "format": "esm",
+      "target": "es2020"
+    },
+    {
       "mod": "copy",
       "files": "*.html",
       "from": "src"

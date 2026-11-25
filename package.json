@@ -1,0 +1,23 @@
+{
+  "name": "stark",
+  "version": "1.0.0",
+  "description": "Stark - Autonomous Industry and Space Colonization",
+  "main": "dist/index.html",
+  "scripts": {
+    "build": "bash 1.ops/build.sh",
+    "dev": "bash 1.ops/build.sh && cd dist && python3 -m http.server 8080",
+    "clean": "rm -rf dist/*"
+  },
+  "keywords": [
+    "webgl",
+    "shaders",
+    "animation",
+    "frontend"
+  ],
+  "author": "Stark",
+  "license": "MIT",
+  "devDependencies": {
+    "sass": "^1.69.0",
+    "typescript": "^5.7.0"
+  }
+}
